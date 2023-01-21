@@ -12,7 +12,9 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const PORT = process.env.PORT || 3306;
 const cors = require("cors");
 const corsOptions = {
-  origin: "https://diary30woo.web.app",
+  //origin: "http://localhost:3000",
+  //origin: "https://diary30woo.web.app",
+  origin: ["http://localhost:3000", "https://diary30woo.web.app"],
 };
 
 // app.set("port", process.env.PORT || 3305);
@@ -174,6 +176,7 @@ app.post("/api/questions", async function (req, res) {
         question: req.body.question,
         question_selection: req.body.question_selection,
         question_type: req.body.question_type,
+        question_order: req.body.question_order,
       });
       await newQuestion.save();
       //await questions.updateOne({user_id: req.body.user_id}, {$set : {question_answers: []}})
@@ -182,9 +185,8 @@ app.post("/api/questions", async function (req, res) {
       const newQuestion = new questions({
         user_id: req.body.user_id,
         question: req.body.question,
-        //question_selection: JSON.stringify([]),
         question_type: req.body.question_type,
-        //question_answers: JSON.stringify([]),
+        question_order: req.body.question_order,
       });
       await newQuestion.save();
       //await questions.updateOne({user_id: req.body.user_id}, {$set : {question_selection: []}})
@@ -216,22 +218,25 @@ app.get("/api/questions/:user_id", async function (req, res) {
 // }));
 
 //delete
-app.delete("/api/questions/:user_id&:question", async function (req, res) {
-  try {
-    let idInstance = req.params.user_id;
-    let questionInstance = req.params.question;
+app.delete(
+  "/api/questions/:user_id&:question_order",
+  async function (req, res) {
+    try {
+      let idInstance = req.params.user_id;
+      let questionOrder = req.params.question_order;
 
-    await questions.deleteOne({
-      user_id: idInstance,
-      question: questionInstance,
-    });
-    console.log("Delete completed!");
-  } catch (error) {
-    console.log("Error on Delete: " + error.message);
-    res.status(400);
-    res.send(error.message);
+      await questions.deleteOne({
+        user_id: idInstance,
+        question_order: questionOrder,
+      });
+      console.log("Delete completed!");
+    } catch (error) {
+      console.log("Error on Delete: " + error.message);
+      res.status(400);
+      res.send(error.message);
+    }
   }
-});
+);
 
 app.put("/api/questions", async function (req, res) {
   console.log("Put with body: " + JSON.stringify(req.body));
