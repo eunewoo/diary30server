@@ -1,3 +1,10 @@
+const cors = require("cors");
+const corsOptions = {
+  //origin: "http://localhost:3000",
+  //origin: "https://diary30woo.web.app",
+  origin: ["http://localhost:3000", "https://diary30woo.web.app"],
+};
+
 const functions = require("firebase-functions");
 
 const express = require("express");
@@ -10,12 +17,6 @@ const app = express();
 var bodyParser = require("body-parser");
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const PORT = process.env.PORT || 3306;
-const cors = require("cors");
-const corsOptions = {
-  //origin: "http://localhost:3000",
-  //origin: "https://diary30woo.web.app",
-  origin: ["http://localhost:3000", "https://diary30woo.web.app"],
-};
 
 // app.set("port", process.env.PORT || 3305);
 app.use(cors(corsOptions));
