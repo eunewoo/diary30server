@@ -18,8 +18,17 @@ var bodyParser = require("body-parser");
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
 const PORT = process.env.PORT || 3306;
 
+//Set up mongoose connection
+var mongoDB =
+  "mongodb://eunewoo:mongoconquer98@ac-0vyijen-shard-00-00.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-01.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-02.kciyq16.mongodb.net:27017/?ssl=true&replicaSet=atlas-9pxc0l-shard-0&authSource=admin&retryWrites=true&w=majority"; // insert your database URL here
+mongoose.set("strictQuery", true);
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
+var db = mongoose.connection;
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
+
 // app.set("port", process.env.PORT || 3305);
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,16 +41,16 @@ const multerS3 = require("multer-s3");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const localStorage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename(req, file, cb) {
-    cb(null, `${Date.now()}_${file.originalname}`);
-  },
-});
+// const localStorage = multer.diskStorage({
+//   destination(req, file, cb) {
+//     cb(null, "uploads/");
+//   },
+//   filename(req, file, cb) {
+//     cb(null, `${Date.now()}_${file.originalname}`);
+//   },
+// });
 
-const localUpload = multer({ storage: localStorage });
+// const localUpload = multer({ storage: localStorage });
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY,
@@ -53,7 +62,7 @@ var mimetype;
 const upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: "316projectimage",
+    bucket: "s3diary30image",
     key: function (req, file, cb) {
       mimetype = file.mimetype;
       console.log(mimetype);
@@ -70,7 +79,7 @@ const upload = multer({
 });
 
 //request for image upload
-app.post("/img", upload.single("file"), async (req, res) => {
+app.post("/img", upload.single("file"), async function (req, res) {
   console.log("in upload method");
   //const files = req.files;
   const file = req.file;
@@ -82,17 +91,10 @@ app.post("/img", upload.single("file"), async (req, res) => {
   res.send(file);
 });
 
-//Set up mongoose connection
-var mongoDB =
-  "mongodb://eunewoo:mongoconquer98@ac-0vyijen-shard-00-00.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-01.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-02.kciyq16.mongodb.net:27017/?ssl=true&replicaSet=atlas-9pxc0l-shard-0&authSource=admin&retryWrites=true&w=majority"; // insert your database URL here
-mongoose.set("strictQuery", true);
-mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
-var db = mongoose.connection;
-db.on("error", console.error.bind(console, "MongoDB connection error:"));
-
 // have to put lock method to prevent user data later, maybe set middleware
 // did not set error handling yet
 app.get("/api/users", async function (req, res) {
+  console.log("USER REQUEST");
   const usersInstance = await users.find({});
   res.json(usersInstance);
 });

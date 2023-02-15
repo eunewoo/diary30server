@@ -52,11 +52,11 @@ PUT http://localhost:3305/api/questions
 Content-Type: application/json
 
 {
-  "user_id": "eunewoo",
-  "question": "Do you satisfy your day3?",
-  "question_selection": ["Perfect", "SoSo", "Bad"],
-  "question_type": "multiple choice",
-  "question_answers": ["put"]
+  "user_id": "kyotos5",
+  "question": "한 줄 피드백",
+  "question_selection": [],
+  "question_type": "text",
+  "question_answers": [1],
 }
 
 ###

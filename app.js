@@ -1,3 +1,12 @@
+const cors = require("cors");
+const corsOptions = {
+  //origin: "http://localhost:3000",
+  //origin: "https://diary30woo.web.app",
+  origin: ["http://localhost:3000", "https://diary30woo.web.app"],
+};
+
+//const functions = require("firebase-functions");
+
 const express = require("express");
 const mongoose = require("mongoose");
 const users = require("./models/users");
@@ -6,76 +15,8 @@ const questions = require("./models/questions");
 const app = express();
 
 var bodyParser = require("body-parser");
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+var urlencodedParser = bodyParser.urlencoded({ extended: true });
 const PORT = process.env.PORT || 3306;
-const cors = require("cors");
-const corsOptions = {
-  origin: "https://diary30woo.web.app",
-};
-
-app.set("port", process.env.PORT || 3305);
-app.use(cors(corsOptions));
-app.use(bodyParser.json());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-//AWS image upload part
-const multer = require("multer");
-const AWS = require("aws-sdk");
-const multerS3 = require("multer-s3");
-
-const dotenv = require("dotenv");
-dotenv.config();
-
-const localStorage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, "uploads/");
-  },
-  filename(req, file, cb) {
-    cb(null, `${Date.now()}_${file.originalname}`);
-  },
-});
-
-const localUpload = multer({ storage: localStorage });
-
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
-
-var mimetype;
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: "316projectimage",
-    key: function (req, file, cb) {
-      mimetype = file.mimetype;
-      console.log(mimetype);
-      var ext = file.mimetype.split("/")[1];
-      if (!["png", "jpg", "jpeg", "gif", "bmp"].includes(ext)) {
-        return cb(new Error("Only images are allowed"));
-      }
-      cb(null, Date.now() + "." + file.originalname.split(".").pop());
-    },
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-  }),
-  acl: "public-read-write",
-  limits: { fileSize: 100 * 1024 * 1024 },
-});
-
-//request for image upload
-app.post("/img", upload.single("file"), async (req, res) => {
-  console.log("in upload method");
-  //const files = req.files;
-  const file = req.file;
-  //console.log(files)
-  console.log(file);
-  // console.log(req.file.location)
-  // res.status(200).json({ location: req.file.location })
-  //res.send({"status":"api okay"})
-  res.send(file);
-});
 
 //Set up mongoose connection
 var mongoDB =
@@ -84,6 +25,144 @@ mongoose.set("strictQuery", true);
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
+
+// app.set("port", process.env.PORT || 3305);
+app.use(cors(corsOptions));
+app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(urlencodedParser);
+
+//AWS image upload part
+// const multer = require("multer");
+// const AWS = require("aws-sdk");
+// const multerS3 = require("multer-s3");
+
+// const dotenv = require("dotenv");
+// dotenv.config();
+
+// const localStorage = multer.diskStorage({
+//   destination(req, file, cb) {
+//     cb(null, "uploads/");
+//   },
+//   filename(req, file, cb) {
+//     cb(null, `${Date.now()}_${file.originalname}`);
+//   },
+// });
+
+// const localUpload = multer({ storage: localStorage });
+
+// const s3 = new AWS.S3({
+//   accessKeyId: process.env.AWS_ACCESS_KEY,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
+
+// var mimetype;
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     bucket: "s3diary30image",
+//     key: function (req, file, cb) {
+//       mimetype = file.mimetype;
+//       console.log(mimetype);
+//       var ext = file.mimetype.split("/")[1];
+//       if (!["png", "jpg", "jpeg", "gif", "bmp"].includes(ext)) {
+//         return cb(new Error("Only images are allowed"));
+//       }
+//       cb(null, Date.now() + "." + file.originalname.split(".").pop());
+//     },
+//     contentType: multerS3.AUTO_CONTENT_TYPE,
+//   }),
+//   acl: "public-read-write",
+//   limits: { fileSize: 100 * 1024 * 1024 },
+// });
+
+// //request for image upload
+// app.post("/img", upload.single("file"), async function (req, res) {
+//   console.log("in upload method");
+//   //const files = req.files;
+//   const file = req.file;
+//   //console.log(files)
+//   console.log(file);
+//   // console.log(req.file.location)
+//   // res.status(200).json({ location: req.file.location })
+//   //res.send({"status":"api okay"})
+//   res.send(file);
+// });
+
+const dotenv = require("dotenv");
+dotenv.config();
+
+const AWS = require("aws-sdk");
+//const UUID = require("uuid/v4");
+const Busboy = require("busboy");
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+const S3 = new AWS.S3();
+
+app.post("/upload", (req, res) => {
+  let chunks = [],
+    fname,
+    ftype,
+    fEncoding;
+  let busboy = Busboy({ headers: req.headers });
+  console.log();
+  busboy.on("error", (err) => console.log("err : ", err));
+  busboy.on("file", () => {
+    console.log("in busboy parser");
+    console.log(name, file, info);
+    // console.log(
+    //   "File [" +
+    //     fieldname +
+    //     "]: filename: " +
+    //     filename +
+    //     ", encoding: " +
+    //     encoding +
+    //     ", mimetype: " +
+    //     mimetype
+    // );
+    // fname = filename.replace(/ /g, "_");
+    // ftype = mimetype;
+    // fEncoding = encoding;
+    // file.on("data", function (data) {
+    //   // you will get chunks here will pull all chunk to an array and later concat it.
+    //   console.log(chunks.length);
+    //   chunks.push(data);
+    // });
+    // file.on("end", function () {
+    //   console.log("File [" + filename + "] Finished");
+    // });
+  });
+  busboy.on("finish", function () {
+    //const userId = UUID();
+    const params = {
+      Bucket: "s3diary30image", // your s3 bucket name
+      Key: `${fname}`,
+      Body: Buffer.concat(chunks), // concatinating all chunks
+      ACL: "public-read",
+      ContentEncoding: fEncoding, // optional
+      ContentType: AUTO_CONTENT_TYPE,
+      //ContentType: ftype, // required
+    };
+    // we are sending buffer data to s3.
+    S3.upload(params, (err, s3res) => {
+      if (err) {
+        res.send({ err, status: "error" });
+      } else {
+        res.send({
+          data: s3res,
+          status: "success",
+          msg: "Image successfully uploaded.",
+        });
+      }
+    });
+  });
+  req.pipe(busboy);
+});
 
 // have to put lock method to prevent user data later, maybe set middleware
 // did not set error handling yet
@@ -172,6 +251,7 @@ app.post("/api/questions", async function (req, res) {
         question: req.body.question,
         question_selection: req.body.question_selection,
         question_type: req.body.question_type,
+        question_order: req.body.question_order,
       });
       await newQuestion.save();
       //await questions.updateOne({user_id: req.body.user_id}, {$set : {question_answers: []}})
@@ -180,9 +260,8 @@ app.post("/api/questions", async function (req, res) {
       const newQuestion = new questions({
         user_id: req.body.user_id,
         question: req.body.question,
-        //question_selection: JSON.stringify([]),
         question_type: req.body.question_type,
-        //question_answers: JSON.stringify([]),
+        question_order: req.body.question_order,
       });
       await newQuestion.save();
       //await questions.updateOne({user_id: req.body.user_id}, {$set : {question_selection: []}})
@@ -214,22 +293,26 @@ app.get("/api/questions/:user_id", async function (req, res) {
 // }));
 
 //delete
-app.delete("/api/questions/:user_id&:question", async function (req, res) {
-  try {
-    let idInstance = req.params.user_id;
-    let questionInstance = req.params.question;
+app.delete(
+  "/api/questions/:user_id&:question_order",
+  async function (req, res) {
+    try {
+      let idInstance = req.params.user_id;
+      let questionOrder = req.params.question_order;
 
-    await questions.deleteOne({
-      user_id: idInstance,
-      question: questionInstance,
-    });
-    console.log("Delete completed!");
-  } catch (error) {
-    console.log("Error on Delete: " + error.message);
-    res.status(400);
-    res.send(error.message);
+      await questions.deleteOne({
+        user_id: idInstance,
+        question_order: questionOrder,
+      });
+      console.log("Delete completed!");
+      res.send("Delete questions with id: " + questionOrder);
+    } catch (error) {
+      console.log("Error on Delete: " + error.message);
+      res.status(400);
+      res.send(error.message);
+    }
   }
-});
+);
 
 app.put("/api/questions", async function (req, res) {
   console.log("Put with body: " + JSON.stringify(req.body));
@@ -256,7 +339,8 @@ app.put("/api/questions", async function (req, res) {
   }
 });
 
-const port = process.env.PORT || 3305;
+port = process.env.PORT || 3305;
 app.listen(port, () => {
   console.log("Server started on port " + port);
 });
+//exports.app = functions.https.onRequest(app);
