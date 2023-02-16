@@ -16,7 +16,7 @@ const app = express();
 
 var bodyParser = require("body-parser");
 var urlencodedParser = bodyParser.urlencoded({ extended: false });
-const PORT = process.env.PORT || 3306;
+//const PORT = process.env.PORT || 3306;
 
 //Set up mongoose connection
 var mongoDB =
@@ -268,8 +268,9 @@ app.put("/api/questions", async function (req, res) {
   }
 });
 
-// port = process.env.PORT || 3305;
-// app.listen(port, () => {
+// const PORT = process.env.PORT || 5001;
+// app.listen(PORT, () => {
 //   console.log("Server started on port " + port);
 // });
+
 exports.app = functions.https.onRequest(app);
