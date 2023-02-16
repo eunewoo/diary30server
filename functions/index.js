@@ -32,14 +32,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(urlencodedParser);
 
 //AWS image upload part
-const multer = require("multer");
-const AWS = require("aws-sdk");
-const multerS3 = require("multer-s3");
+// const multer = require("multer");
+// const AWS = require("aws-sdk");
+// const multerS3 = require("multer-s3");
 
-const dotenv = require("dotenv");
-dotenv.config();
+// const dotenv = require("dotenv");
+// dotenv.config();
 
 // const localStorage = multer.diskStorage({
 //   destination(req, file, cb) {
@@ -52,44 +53,44 @@ dotenv.config();
 
 // const localUpload = multer({ storage: localStorage });
 
-const s3 = new AWS.S3({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-  region: process.env.AWS_REGION,
-});
+// const s3 = new AWS.S3({
+//   accessKeyId: process.env.AWS_ACCESS_KEY,
+//   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//   region: process.env.AWS_REGION,
+// });
 
-var mimetype;
-const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: "s3diary30image",
-    key: function (req, file, cb) {
-      mimetype = file.mimetype;
-      console.log(mimetype);
-      var ext = file.mimetype.split("/")[1];
-      if (!["png", "jpg", "jpeg", "gif", "bmp"].includes(ext)) {
-        return cb(new Error("Only images are allowed"));
-      }
-      cb(null, Date.now() + "." + file.originalname.split(".").pop());
-    },
-    contentType: multerS3.AUTO_CONTENT_TYPE,
-  }),
-  acl: "public-read-write",
-  limits: { fileSize: 100 * 1024 * 1024 },
-});
+// var mimetype;
+// const upload = multer({
+//   storage: multerS3({
+//     s3: s3,
+//     bucket: "s3diary30image",
+//     key: function (req, file, cb) {
+//       mimetype = file.mimetype;
+//       console.log(mimetype);
+//       var ext = file.mimetype.split("/")[1];
+//       if (!["png", "jpg", "jpeg", "gif", "bmp"].includes(ext)) {
+//         return cb(new Error("Only images are allowed"));
+//       }
+//       cb(null, Date.now() + "." + file.originalname.split(".").pop());
+//     },
+//     contentType: multerS3.AUTO_CONTENT_TYPE,
+//   }),
+//   acl: "public-read-write",
+//   limits: { fileSize: 100 * 1024 * 1024 },
+// });
 
-//request for image upload
-app.post("/img", upload.single("file"), async function (req, res) {
-  console.log("in upload method");
-  //const files = req.files;
-  const file = req.file;
-  //console.log(files)
-  console.log(file);
-  // console.log(req.file.location)
-  // res.status(200).json({ location: req.file.location })
-  //res.send({"status":"api okay"})
-  res.send(file);
-});
+// //request for image upload
+// app.post("/img", upload.single("file"), async function (req, res) {
+//   console.log("in upload method");
+//   //const files = req.files;
+//   const file = req.file;
+//   //console.log(files)
+//   console.log(file);
+//   // console.log(req.file.location)
+//   // res.status(200).json({ location: req.file.location })
+//   //res.send({"status":"api okay"})
+//   res.send(file);
+// });
 
 // have to put lock method to prevent user data later, maybe set middleware
 // did not set error handling yet
@@ -233,6 +234,7 @@ app.delete(
         question_order: questionOrder,
       });
       console.log("Delete completed!");
+      res.send("Delete questions with id: " + questionOrder);
     } catch (error) {
       console.log("Error on Delete: " + error.message);
       res.status(400);
