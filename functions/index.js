@@ -1,7 +1,5 @@
 const cors = require("cors");
 const corsOptions = {
-  //origin: "http://localhost:3000",
-  //origin: "https://diary30woo.web.app",
   origin: ["http://localhost:3000", "https://diary30woo.web.app"],
 };
 
@@ -206,20 +204,20 @@ app.post("/api/questions", async function (req, res) {
 //get questions by user_id
 app.get("/api/questions/:user_id", async function (req, res) {
   let idInstance = req.params.user_id;
-  const question = await questions.find({ user_id: idInstance });
-  if (question) {
-    res.json(question);
-  } else {
-    res.send("No questions with id: " + id);
+  console.log("idInstance type", idInstance);
+  //const question = await questions.find({ user_id: idInstance });
+  try {
+    const question = await questions.find({ user_id: idInstance });
+    if (question) {
+      res.json(question);
+    } else {
+      res.send("No questions with id: " + id);
+    }
+  } catch (err) {
+    console.error("Error on getting questions : ", err);
+    res.status(500).send("Internal Server Error");
   }
 });
-
-// router.delete('/authors/:id', isAgent, wrapAsync(async function (req, res) {
-//     const id = req.params.id;
-//     const result = await Author.findByIdAndDelete(id);
-//     console.log("Deleted successfully: " + result);
-//     res.json(result);
-// }));
 
 //delete
 app.delete(

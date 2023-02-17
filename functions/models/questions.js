@@ -2,9 +2,15 @@ var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
+//user_id: {type: Schema.Types.ObjectId, ref: 'users', required: true},
+
 var questionsSchema = new Schema({
-  //user_id: {type: Schema.Types.ObjectId, ref: 'users', required: true},
-  user_id: { type: String },
+  user_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "users",
+    required: true,
+  },
+  //user_id: { type: String },
   question: { type: String },
   question_selection: { type: Array },
   question_type: { type: String },
