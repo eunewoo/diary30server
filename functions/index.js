@@ -10,9 +10,6 @@ const usersRoute = require("./routes/usersRoute");
 const questionsRoute = require("./routes/questionsRoute");
 
 const app = express();
-var bodyParser = require("body-parser");
-app.use(bodyParser.json());
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 const mongoose = require("mongoose");
 //const users = require("./models/users");
@@ -30,12 +27,13 @@ db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 // app.set("port", process.env.PORT || 3305);
 // app.use(cors(corsOptions));
-app.use(cors());
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(urlencodedParser);
 
+// Routes
 app.use("/api", usersRoute);
 app.use("/api", questionsRoute);
 

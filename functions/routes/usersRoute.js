@@ -1,32 +1,53 @@
 const express = require("express");
 const router = express.Router();
 const users = require("../models/users");
-//const { wrapAsync } = require("../utils/helper");
+const { wrapAsync } = require("../utils/helper");
+const usersService = require("../services/usersService");
 
-router.get("/users", async function (req, res) {
-  console.log("USER REQUEST");
-  const usersInstance = await users.find({});
-  res.json(usersInstance);
-});
+//get all user id to check for duplication in register page
+//This should be fixed for security
+router.get(
+  "/users",
+  wrapAsync(async function (req, res) {
+    const usersInstance = await users.find({});
+    res.json(usersInstance);
+  })
+);
 
-//get a user id from db
-router.get("/users/:user_id", async function (req, res) {
-  let idInstance = req.params.user_id;
-  const user = await users.find({ user_id: idInstance });
+//get a user id from db when login
+// router.get(
+//   "/users/:user_id",
+//   wrapAsync(async function (req, res) {
+//     let idInstance = req.params.user_id;
+//     const user = await users.find({ user_id: idInstance });
 
-  if (user == undefined) {
-    res.send("No user with id: " + idInstance);
-    console.log("No user with id: " + idInstance);
-  } else {
-    res.json(user);
-  }
-});
+//     if (!user) {
+//       res.status(404).send("No user with id: " + idInstance);
+//     } else {
+//       res.json(user);
+//     }
+//   })
+// );
+router.get(
+  "/users/:user_id",
+  wrapAsync(async function (req, res) {
+    const idInstance = req.params.user_id;
+    const user = await usersService.getUserById(idInstance);
 
-//
-router.post("/users", async function (req, res) {
-  console.log("Posted with body: " + JSON.stringify(req.body));
+    if (!user) {
+      res.status(404).send("No user with id: " + idInstance);
+    } else {
+      res.json(user);
+    }
+  })
+);
 
-  try {
+//post new user to db when registering
+router.post(
+  "/users",
+  wrapAsync(async function (req, res) {
+    console.log("Posted with body: " + JSON.stringify(req.body));
+
     const newUser = new users({
       user_id: req.body.user_id,
       password: req.body.password,
@@ -38,17 +59,21 @@ router.post("/users", async function (req, res) {
     });
     await newUser.save();
     res.json(newUser);
-  } catch (error) {
-    console.log("Error on Post: " + error.message);
-    res.status(400);
-    res.send(error.message);
-  }
-});
+    // try {
+    // } catch (error) {
+    //   console.log("Error on Post: " + error.message);
+    //   res.status(400);
+    //   res.send(error.message);
+    // }
+  })
+);
 
-router.put("/api/users", async function (req, res) {
-  console.log("Put with body: " + JSON.stringify(req.body));
+//Change user profile in profile page
+router.put(
+  "/api/users",
+  wrapAsync(async function (req, res) {
+    console.log("Put with body: " + JSON.stringify(req.body));
 
-  try {
     const userId = req.body.user_id;
     const newUser = {
       user_id: req.body.user_id,
@@ -61,11 +86,13 @@ router.put("/api/users", async function (req, res) {
     };
     await users.updateOne({ user_id: userId }, newUser);
     res.json(newUser);
-  } catch (error) {
-    console.log("Error on Post: " + error.message);
-    res.status(400);
-    res.send(error.message);
-  }
-});
+    // try {
+    // } catch (error) {
+    //   console.log("Error on Post: " + error.message);
+    //   res.status(400);
+    //   res.send(error.message);
+    // }
+  })
+);
 
 module.exports = router;
