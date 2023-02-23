@@ -10,24 +10,15 @@ router.get(
   "/users",
   wrapAsync(async function (req, res) {
     const usersInstance = await users.find({});
-    res.json(usersInstance);
+    const usersIdArray = [];
+    for (let i in usersInstance) {
+      usersIdArray.push(usersInstance[i].user_id);
+    }
+    console.log("usersIdArray", usersIdArray);
+    res.json(usersIdArray);
   })
 );
 
-//get a user id from db when login
-// router.get(
-//   "/users/:user_id",
-//   wrapAsync(async function (req, res) {
-//     let idInstance = req.params.user_id;
-//     const user = await users.find({ user_id: idInstance });
-
-//     if (!user) {
-//       res.status(404).send("No user with id: " + idInstance);
-//     } else {
-//       res.json(user);
-//     }
-//   })
-// );
 router.get(
   "/users/:user_id",
   wrapAsync(async function (req, res) {
@@ -70,7 +61,7 @@ router.post(
 
 //Change user profile in profile page
 router.put(
-  "/api/users",
+  "/users",
   wrapAsync(async function (req, res) {
     console.log("Put with body: " + JSON.stringify(req.body));
 

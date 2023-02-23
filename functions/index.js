@@ -1,4 +1,5 @@
 const cors = require("cors");
+//allow url for only front localhost and front firebase server
 const corsOptions = {
   origin: ["http://localhost:3000", "https://diary30woo.web.app"],
 };
@@ -13,7 +14,6 @@ const app = express();
 
 const mongoose = require("mongoose");
 //const users = require("./models/users");
-const questions = require("./models/questions");
 
 //const PORT = process.env.PORT || 3306;
 
@@ -36,10 +36,5 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use("/api", usersRoute);
 app.use("/api", questionsRoute);
-
-// const PORT = process.env.PORT || 5001;
-// app.listen(PORT, () => {
-//   console.log("Server started on port " + port);
-// });
 
 exports.app = functions.https.onRequest(app);
