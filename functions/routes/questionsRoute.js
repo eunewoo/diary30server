@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const questions = require("../models/questions");
+const { isAgent } = require("../middleware/auth");
 
 router.post("/questions", async function (req, res) {
   console.log("Posted with body: " + JSON.stringify(req.body));
@@ -54,25 +55,29 @@ router.get("/questions/:user_id", async function (req, res) {
 });
 
 //delete
-router.delete("/questions/:user_id&:question_order", async function (req, res) {
-  try {
-    let idInstance = req.params.user_id;
-    let questionOrder = req.params.question_order;
+router.delete(
+  "/questions/:user_id&:question_order",
+  isAgent,
+  async function (req, res) {
+    try {
+      let idInstance = req.params.user_id;
+      let questionOrder = req.params.question_order;
 
-    await questions.deleteOne({
-      user_id: idInstance,
-      question_order: questionOrder,
-    });
-    console.log("Delete completed!");
-    res.send("Delete questions with id: " + questionOrder);
-  } catch (error) {
-    console.log("Error on Delete: " + error.message);
-    res.status(400);
-    res.send(error.message);
+      await questions.deleteOne({
+        user_id: idInstance,
+        question_order: questionOrder,
+      });
+      console.log("Delete completed!");
+      res.send("Delete questions with id: " + questionOrder);
+    } catch (error) {
+      console.log("Error on Delete: " + error.message);
+      res.status(400);
+      res.send(error.message);
+    }
   }
-});
+);
 
-router.put("/questions", async function (req, res) {
+router.put("/questions", isAgent, async function (req, res) {
   console.log("Put with body: " + JSON.stringify(req.body));
 
   try {

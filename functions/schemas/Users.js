@@ -38,7 +38,7 @@ function userCreate(
   user_name,
   user_email,
   address_f,
-  adress_i,
+  address_i,
   img
 ) {
   userdetail = {
@@ -47,7 +47,7 @@ function userCreate(
     user_name: user_name,
     user_email: user_email,
     address_f: address_f,
-    adress_i: adress_i,
+    address_i: address_i,
     img: img,
   };
 
