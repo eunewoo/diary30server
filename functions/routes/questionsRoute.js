@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const questions = require("../models/questions");
 const { isAgent } = require("../middleware/auth");
+const { wrapAsync } = require("../utils/helper");
 
 router.post("/questions", async function (req, res) {
   console.log("Posted with body: " + JSON.stringify(req.body));
@@ -33,6 +34,35 @@ router.post("/questions", async function (req, res) {
     console.log("Error on Post: " + error.message);
     res.status(400);
     res.send(error.message);
+  }
+});
+
+router.get("/questions/all", async function (req, res) {
+  console.log("Request: ");
+  // console.log(req.session.cookie);
+  // const Store = req.session.cookie.value.MemoryStore;
+  // const store = new Store();
+  // console.dir(store);
+
+  // console.log(req.sessionStore);
+  // console.log(req.body);
+  //console.log("cookie: ", req.cookies.cookieName);
+
+  // req.session.userId2 = "questionsAll";
+
+  console.log("sessionID2", req.session.userId);
+
+  try {
+    const question = await questions.find({ user_id: req.session.userId });
+    console.log("qestion questions all", question);
+    if (question) {
+      res.json(question);
+    } else {
+      res.send("No questions with id: " + id);
+    }
+  } catch (err) {
+    console.error("Error on getting questions : ", err);
+    res.status(500).send("Internal Server Error");
   }
 });
 

@@ -61,23 +61,25 @@ router.post(
   wrapAsync(async function (req, res) {
     const { user_id, password } = req.body;
 
-    console.log("reqID", user_id);
-
     const user = await usersService.getUserById(user_id);
 
-    console.log("user", user);
-
     if (!user) {
-      res.status(404).send("No user with id: " + user_id);
+      res.status(305).send("No user with id: " + user_id);
     } else {
       let reqHash = hashutil(user_id, user[0].user_email, password);
 
-      console.log("reqhash", reqHash);
-      console.log("hash", user[0].password);
-
       if (reqHash === user[0].password) {
-        req.session.userId = user._id;
-        res.sendStatus(204);
+        console.log("sessionID", req.sessionID);
+        req.session.sessionID = req.sessionID;
+
+        req.session.userId = user[0]._id;
+        req.cookies.cookieName = user[0]._id;
+
+        console.log("req.session:");
+        console.log(req.session);
+
+        res.send("done");
+        // res.status(201).json({ msg: "well sended!" });
       } else {
         res.sendStatus(401);
       }
