@@ -69,17 +69,10 @@ router.post(
       let reqHash = hashutil(user_id, user[0].user_email, password);
 
       if (reqHash === user[0].password) {
-        console.log("sessionID", req.sessionID);
-        req.session.sessionID = req.sessionID;
+        req.session.userId = user[0]._id.toString();
+        console.log("로그인 시 부여해준 session.userId: ", req.session.userId);
 
-        req.session.userId = user[0]._id;
-        req.cookies.cookieName = user[0]._id;
-
-        console.log("req.session:");
-        console.log(req.session);
-
-        res.send("done");
-        // res.status(201).json({ msg: "well sended!" });
+        res.sendStatus(201);
       } else {
         res.sendStatus(401);
       }

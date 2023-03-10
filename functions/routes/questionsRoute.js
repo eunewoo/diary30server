@@ -38,23 +38,13 @@ router.post("/questions", async function (req, res) {
 });
 
 router.get("/questions/all", async function (req, res) {
-  console.log("Request: ");
-  // console.log(req.session.cookie);
-  // const Store = req.session.cookie.value.MemoryStore;
-  // const store = new Store();
-  // console.dir(store);
-
-  // console.log(req.sessionStore);
-  // console.log(req.body);
-  //console.log("cookie: ", req.cookies.cookieName);
-
-  // req.session.userId2 = "questionsAll";
-
-  console.log("sessionID2", req.session.userId);
-
   try {
+    const session = req.session;
+    console.log("session from session:", session);
+    console.log("userID from the session: ", session.userId);
+
     const question = await questions.find({ user_id: req.session.userId });
-    console.log("qestion questions all", question);
+    console.log("question questions all", question);
     if (question) {
       res.json(question);
     } else {
