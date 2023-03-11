@@ -8,7 +8,7 @@ var usersSchema = new Schema({
   user_name: { type: String },
   user_email: { type: String },
   address_f: { type: String },
-  adress_i: { type: String },
+  address_l: { type: String },
   img: { type: String },
 });
 

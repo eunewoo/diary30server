@@ -1,9 +1,9 @@
-const cors = require("cors");
-const corsOptions = {
-  //origin: "http://localhost:3000",
-  //origin: "https://diary30woo.web.app",
-  origin: ["http://localhost:3000", "https://diary30woo.web.app"],
-};
+// const cors = require("cors");
+// const corsOptions = {
+//   //origin: "http://localhost:3000",
+//   //origin: "https://diary30woo.web.app",
+//   origin: ["http://localhost:3000", "https://diary30woo.web.app"],
+// };
 
 //const functions = require("firebase-functions");
 
@@ -27,7 +27,7 @@ var db = mongoose.connection;
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
 // app.set("port", process.env.PORT || 3305);
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

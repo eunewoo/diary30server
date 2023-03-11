@@ -8,25 +8,25 @@ const corsOptions = {
   allowedHeaders: ["Origin", "X-Requested-With", "Content-Type", "Accept"],
 };
 
+const usersRoute = require("./routes/usersRoute");
+const questionsRoute = require("./routes/questionsRoute");
+
 const app = express();
 const cookieParser = require("cookie-parser");
 
 // Middleware
 app.use(cors(corsOptions));
-// app.use(cookieParser());
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const functions = require("firebase-functions");
 
-const usersRoute = require("./routes/usersRoute");
-const questionsRoute = require("./routes/questionsRoute");
-
 // const bodyParser = require("body-parser");
 // app.use(bodyParser.json());
 
 app.use(function (req, res, next) {
-  // res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+  // res.header("Access-Control-Allow-Origin", "https://diary30woo.web.app");
   // res.setHeader("Access-Control-Allow-Credentials", "true");
   // res.header(
   //   "Access-Control-Allow-Headers",
@@ -54,7 +54,7 @@ const store = MongoStore.create({
   mongoUrl: mongoDB,
   dbName: "test",
   collectionName: "sessions",
-  // secret: sessionSecret,
+  secret: sessionSecret,
   // touchAfter: 24 * 60 * 60,
 });
 
@@ -63,15 +63,14 @@ const store = MongoStore.create({
 // Setup to use the express-session package
 const sessionConfig = {
   store,
-  name: "session2",
+  name: "session",
   secret: sessionSecret,
-  resave: false,
+  //resave: false,
   saveUninitialized: false,
   cookie: {
-    // httpOnly: true,
+    httpOnly: true,
     // expires: Date.now() + 1000 * 60 * 60,
     maxAge: 1000 * 60 * 60,
-    // value: session._id,
     secure: true,
     // secure: false,
   },
