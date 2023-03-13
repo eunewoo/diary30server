@@ -1,4 +1,5 @@
 var mongoose = require("mongoose");
+var mongoose = require("mongoose");
 
 var Schema = mongoose.Schema;
 
@@ -16,6 +17,10 @@ var usersSchema = new Schema({
 usersSchema.virtual("url").get(function () {
   return "/catalog/users/" + this._id;
 });
+usersSchema.virtual("url").get(function () {
+  return "/catalog/users/" + this._id;
+});
 
 //Export model
+module.exports = mongoose.model("users", usersSchema);
 module.exports = mongoose.model("users", usersSchema);
