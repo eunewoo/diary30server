@@ -16,10 +16,5 @@ var questionsSchema = new Schema({
   question_order: { type: String },
 });
 
-// Virtual for book's URL
-questionsSchema.virtual("url").get(function () {
-  return "/catalog/questions/" + this._id;
-});
-
 //Export model
 module.exports = mongoose.model("questions", questionsSchema);

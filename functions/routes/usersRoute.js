@@ -7,8 +7,8 @@ const UsersService = require("../services/usersService");
 
 const usersService = new UsersService();
 
-//get all user id to check for duplication in register page
-//This should be fixed for security
+// GET all user id to check for duplication in register page
+// For security, code is changed from sending all user data to only send user_id
 router.get(
   "/users",
   wrapAsync(async function (req, res) {
@@ -22,6 +22,8 @@ router.get(
   })
 );
 
+// GET user id using user_id
+// This runs when the specific user's login process is completed
 router.get(
   "/users/:user_id",
   wrapAsync(async function (req, res) {
@@ -36,7 +38,7 @@ router.get(
   })
 );
 
-//post new user to db when registering
+// POST new user to db when registering
 router.post(
   "/users",
   wrapAsync(async function (req, res) {
@@ -56,36 +58,42 @@ router.post(
   })
 );
 
-router.post(
-  "/users/login",
-  wrapAsync(async function (req, res) {
-    const { user_id, password } = req.body;
+// When user click login button,
+// POST questions by saving user's data as session when login is succeeded
+// Changed part is: adapted session for better security
+// Make user_id&passsword hash from client side to backend
+// But not adapted in deployed version yet
 
-    console.log("reqID", user_id);
+// router.post(
+//   "/users/login",
+//   wrapAsync(async function (req, res) {
+//     const { user_id, password } = req.body;
 
-    const user = await usersService.getUserById(user_id);
+//     console.log("reqID", user_id);
 
-    console.log("user", user);
+//     const user = await usersService.getUserById(user_id);
 
-    if (!user) {
-      res.status(404).send("No user with id: " + user_id);
-    } else {
-      let reqHash = hashutil(user_id, user[0].user_email, password);
+//     console.log("user", user);
 
-      console.log("reqhash", reqHash);
-      console.log("hash", user[0].password);
+//     if (!user) {
+//       res.status(404).send("No user with id: " + user_id);
+//     } else {
+//       let reqHash = hashutil(user_id, user[0].user_email, password);
 
-      if (reqHash === user[0].password) {
-        req.session.userId = user._id;
-        res.sendStatus(204);
-      } else {
-        res.sendStatus(401);
-      }
-    }
-  })
-);
+//       console.log("reqhash", reqHash);
+//       console.log("hash", user[0].password);
 
-//Change user profile in profile page
+//       if (reqHash === user[0].password) {
+//         req.session.userId = user._id;
+//         res.sendStatus(204);
+//       } else {
+//         res.sendStatus(401);
+//       }
+//     }
+//   })
+// );
+
+// Change user profile in profile page
 router.put(
   "/users",
   wrapAsync(async function (req, res) {

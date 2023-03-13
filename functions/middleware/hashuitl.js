@@ -1,4 +1,4 @@
-// //import sha256 from "crypto-js/sha256.js";
+// import sha256 from "crypto-js/sha256.js";
 const sha256 = require("crypto-js/sha256.js");
 
 var UInt32 = function (value) {
@@ -13,10 +13,6 @@ var highbit = function (value) {
 // password. Pass in the 3 strings and the hash is generated
 // and returned.
 function hashutil(id, email, password) {
-  //   console.log("|" + id + "|");
-  //   console.log("|" + email + "|");
-  //   console.log("|" + password + "|");
-
   const passhash = sha256(id + email + password);
 
   let passouthash = "";

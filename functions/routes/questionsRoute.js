@@ -7,6 +7,8 @@ router.post("/questions", async function (req, res) {
   console.log("Posted with body: " + JSON.stringify(req.body));
 
   try {
+    // Seperated multiple choice type
+    // Because it has 3 check options in question_selection
     if (req.body.question_type === "multiple choice") {
       const newQuestion = new questions({
         user_id: req.body.user_id,
@@ -38,7 +40,6 @@ router.post("/questions", async function (req, res) {
 router.get("/questions/:user_id", async function (req, res) {
   let idInstance = req.params.user_id;
   console.log("idInstance type", idInstance);
-  //const question = await questions.find({ user_id: idInstance });
   try {
     const question = await questions.find({ user_id: idInstance });
     if (question) {
@@ -53,6 +54,7 @@ router.get("/questions/:user_id", async function (req, res) {
 });
 
 // Delete questions based on two user elements
+// Which are user_id & question_order
 router.delete("/questions/:user_id&:question_order", async function (req, res) {
   try {
     let idInstance = req.params.user_id;
@@ -71,6 +73,8 @@ router.delete("/questions/:user_id&:question_order", async function (req, res) {
   }
 });
 
+// PUT questions
+// But now being used after lock the formed questions
 router.put("/questions", async function (req, res) {
   console.log("Put with body: " + JSON.stringify(req.body));
 
