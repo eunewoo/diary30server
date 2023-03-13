@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const questions = require("../models/questions");
-const { isAgent } = require("../middleware/auth");
 
 // Post new questions
 router.post("/questions", async function (req, res) {
@@ -53,43 +52,26 @@ router.get("/questions/:user_id", async function (req, res) {
   }
 });
 
-<<<<<<< HEAD
 // Delete questions based on two user elements
 router.delete("/questions/:user_id&:question_order", async function (req, res) {
   try {
     let idInstance = req.params.user_id;
     let questionOrder = req.params.question_order;
-=======
-//delete
-router.delete(
-  "/questions/:user_id&:question_order",
-  isAgent,
-  async function (req, res) {
-    try {
-      let idInstance = req.params.user_id;
-      let questionOrder = req.params.question_order;
->>>>>>> 2e11
 
-      await questions.deleteOne({
-        user_id: idInstance,
-        question_order: questionOrder,
-      });
-      console.log("Delete completed!");
-      res.send("Delete questions with id: " + questionOrder);
-    } catch (error) {
-      console.log("Error on Delete: " + error.message);
-      res.status(400);
-      res.send(error.message);
-    }
+    await questions.deleteOne({
+      user_id: idInstance,
+      question_order: questionOrder,
+    });
+    console.log("Delete completed!");
+    res.send("Delete questions with id: " + questionOrder);
+  } catch (error) {
+    console.log("Error on Delete: " + error.message);
+    res.status(400);
+    res.send(error.message);
   }
-);
+});
 
-<<<<<<< HEAD
-// Changing questions, but not used after lock the once formed questions in client side
 router.put("/questions", async function (req, res) {
-=======
-router.put("/questions", isAgent, async function (req, res) {
->>>>>>> 2e11
   console.log("Put with body: " + JSON.stringify(req.body));
 
   try {
