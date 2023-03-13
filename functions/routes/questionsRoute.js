@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const questions = require("../models/questions");
 
+// Post new questions
 router.post("/questions", async function (req, res) {
   console.log("Posted with body: " + JSON.stringify(req.body));
 
@@ -15,7 +16,6 @@ router.post("/questions", async function (req, res) {
         question_order: req.body.question_order,
       });
       await newQuestion.save();
-      //await questions.updateOne({user_id: req.body.user_id}, {$set : {question_answers: []}})
       res.json(newQuestion);
     } else {
       const newQuestion = new questions({
@@ -25,7 +25,6 @@ router.post("/questions", async function (req, res) {
         question_order: req.body.question_order,
       });
       await newQuestion.save();
-      //await questions.updateOne({user_id: req.body.user_id}, {$set : {question_selection: []}})
       res.json(newQuestion);
     }
   } catch (error) {
@@ -35,7 +34,7 @@ router.post("/questions", async function (req, res) {
   }
 });
 
-//get questions by user_id
+// Get questions by user_id
 router.get("/questions/:user_id", async function (req, res) {
   let idInstance = req.params.user_id;
   console.log("idInstance type", idInstance);
@@ -53,7 +52,7 @@ router.get("/questions/:user_id", async function (req, res) {
   }
 });
 
-//delete
+// Delete questions based on two user elements
 router.delete("/questions/:user_id&:question_order", async function (req, res) {
   try {
     let idInstance = req.params.user_id;
@@ -72,6 +71,7 @@ router.delete("/questions/:user_id&:question_order", async function (req, res) {
   }
 });
 
+// Changing questions, but not used after lock the once formed questions in client side
 router.put("/questions", async function (req, res) {
   console.log("Put with body: " + JSON.stringify(req.body));
 
