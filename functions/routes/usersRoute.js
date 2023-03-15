@@ -17,7 +17,7 @@ router.get(
     for (let i in usersInstance) {
       usersIdArray.push(usersInstance[i].user_id);
     }
-    console.log("usersIdArray", usersIdArray);
+    //console.log("usersIdArray", usersIdArray);
     res.json(usersIdArray);
   })
 );
@@ -97,7 +97,7 @@ router.post(
 router.put(
   "/users",
   wrapAsync(async function (req, res) {
-    console.log("Put with body: " + JSON.stringify(req.body));
+    // console.log("Put with body: " + JSON.stringify(req.body));
 
     const userId = req.body.user_ref;
     const newUser = {
