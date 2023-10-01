@@ -1,4 +1,6 @@
 const cors = require("cors");
+require("dotenv").config();
+
 //allow url for only front localhost and front firebase server
 const corsOptions = {
   origin: ["http://localhost:3000", "https://diary30woo.web.app"],
@@ -23,8 +25,7 @@ const MongoStore = require("connect-mongo"); // MongoDB session store
 //const PORT = process.env.PORT || 3306;
 
 //Set up mongoose connection
-var mongoDB =
-  "mongodb://eunewoo:mongoconquer98@ac-0vyijen-shard-00-00.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-01.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-02.kciyq16.mongodb.net:27017/?ssl=true&replicaSet=atlas-9pxc0l-shard-0&authSource=admin&retryWrites=true&w=majority"; // insert your database URL here
+var mongoDB = process.env.MONGODB_URI;
 mongoose.set("strictQuery", true);
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 var db = mongoose.connection;
@@ -34,8 +35,7 @@ const sessionSecret = "make a secret string";
 
 // Create Mongo DB Session Store
 const store = MongoStore.create({
-  mongoUrl:
-    "mongodb://eunewoo:mongoconquer98@ac-0vyijen-shard-00-00.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-01.kciyq16.mongodb.net:27017,ac-0vyijen-shard-00-02.kciyq16.mongodb.net:27017/?ssl=true&replicaSet=atlas-9pxc0l-shard-0&authSource=admin&retryWrites=true&w=majority",
+  mongoUrl: process.env.MONGODB_URI,
   secret: sessionSecret,
   touchAfter: 24 * 60 * 60,
 });

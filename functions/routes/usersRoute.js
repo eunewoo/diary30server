@@ -114,4 +114,20 @@ router.put(
   })
 );
 
+//parkinson
+router.put(
+  "/users/parkinson",
+  wrapAsync(async function (req, res) {
+
+    const userId = req.body.user_id; 
+    const updatedFields = {
+      //address_f: req.body.address_f,
+      img: req.body.img,
+    };
+    
+    await usersService.updateUser(userId, updatedFields);
+    res.json(updatedFields);
+  })
+);
+
 module.exports = router;
