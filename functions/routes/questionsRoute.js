@@ -1,103 +1,80 @@
 const express = require("express");
 const router = express.Router();
-const questions = require("../models/questions");
+const { wrapAsync } = require("../utils/helper");
+const QuestionsService = require("./services/QuestionsService");
 
-// Post new questions
-router.post("/questions", async function (req, res) {
-  console.log("Posted with body: " + JSON.stringify(req.body));
+const questionsService = new QuestionsService();
 
-  try {
-    // Seperated multiple choice type
-    // Because it has 3 check options in question_selection
+router.post(
+  "/questions",
+  wrapAsync(async function (req, res) {
+    console.log("Posted with body: " + JSON.stringify(req.body));
+
+    let data;
     if (req.body.question_type === "multiple choice") {
-      const newQuestion = new questions({
+      data = {
         user_id: req.body.user_id,
         question: req.body.question,
         question_selection: req.body.question_selection,
         question_type: req.body.question_type,
         question_order: req.body.question_order,
-      });
-      await newQuestion.save();
-      res.json(newQuestion);
+      };
     } else {
-      const newQuestion = new questions({
+      data = {
         user_id: req.body.user_id,
         question: req.body.question,
         question_type: req.body.question_type,
         question_order: req.body.question_order,
-      });
-      await newQuestion.save();
-      res.json(newQuestion);
+      };
     }
-  } catch (error) {
-    console.log("Error on Post: " + error.message);
-    res.status(400);
-    res.send(error.message);
-  }
-});
+    const newQuestion = await questionsService.addQuestion(data);
+    res.json(newQuestion);
+  })
+);
 
-// Get questions by user_id
-router.get("/questions/:user_id", async function (req, res) {
-  let idInstance = req.params.user_id;
-  console.log("idInstance type", idInstance);
-  try {
-    const question = await questions.find({ user_id: idInstance });
+router.get(
+  "/questions/:user_id",
+  wrapAsync(async function (req, res) {
+    const idInstance = req.params.user_id;
+    const question = await questionsService.getQuestionsByUserId(idInstance);
     if (question) {
       res.json(question);
     } else {
-      res.send("No questions with id: " + id);
+      res.send("No questions with id: " + idInstance);
     }
-  } catch (err) {
-    console.error("Error on getting questions : ", err);
-    res.status(500).send("Internal Server Error");
-  }
-});
+  })
+);
 
-// Delete questions based on two user elements
-// Which are user_id & question_order
-router.delete("/questions/:user_id&:question_order", async function (req, res) {
-  try {
+router.delete(
+  "/questions/:user_id&:question_order",
+  wrapAsync(async function (req, res) {
     let idInstance = req.params.user_id;
     let questionOrder = req.params.question_order;
 
-    await questions.deleteOne({
-      user_id: idInstance,
-      question_order: questionOrder,
-    });
+    await questionsService.deleteQuestionByUserIdAndOrder(
+      idInstance,
+      questionOrder
+    );
     console.log("Delete completed!");
     res.send("Delete questions with id: " + questionOrder);
-  } catch (error) {
-    console.log("Error on Delete: " + error.message);
-    res.status(400);
-    res.send(error.message);
-  }
-});
+  })
+);
 
-// PUT questions
-// But now being used after lock the formed questions
-router.put("/questions", async function (req, res) {
-  console.log("Put with body: " + JSON.stringify(req.body));
+router.put(
+  "/questions",
+  wrapAsync(async function (req, res) {
+    console.log("Put with body: " + JSON.stringify(req.body));
 
-  try {
-    const userId = req.body.user_id;
-    const userQuestion = req.body.question;
-    const newQuestion = {
+    const data = {
       user_id: req.body.user_id,
       question: req.body.question,
       question_selection: req.body.question_selection,
       question_type: req.body.question_type,
       question_answers: req.body.question_answers,
     };
-    await questions.updateOne(
-      { user_id: userId, question: userQuestion },
-      newQuestion
-    );
-    res.json(newQuestion);
-  } catch (error) {
-    console.log("Error on Post: " + error.message);
-    res.status(400);
-    res.send(error.message);
-  }
-});
+    const updatedQuestion = await questionsService.updateQuestion(data);
+    res.json(updatedQuestion);
+  })
+);
 
 module.exports = router;
